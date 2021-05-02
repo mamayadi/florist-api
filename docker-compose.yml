@@ -1,0 +1,72 @@
+version: '3'
+services:
+  node:
+    # image: fleuriste-node
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - HTTP_PORT=${PORT}
+    container_name: ${APP_CONTAINER_NAME}
+    ports:
+      - '${PORT}:${PORT}'
+    volumes:
+      - ./:/app
+      - /usr/src/app/node_modules
+    depends_on:
+      - mongo
+    tty: true
+    networks:
+      meanstack_net:
+        ipv4_address: ${APP_IP}
+
+  mongo-express:
+    image: mongo-express
+    restart: always
+    container_name: ${DBVIEWER_CONTAINER_NAME}
+    ports:
+      - '${MONGO_EXPRESS_LOCAL}:${MONGO_EXPRESS_CONTAINER}'
+    environment:
+      ME_CONFIG_BASICAUTH_USERNAME: ${MONGO_EXPRESS_USER}
+      ME_CONFIG_BASICAUTH_PASSWORD: ${MONGO_EXPRESS_PASSWORD}
+      ME_CONFIG_MONGODB_PORT: ${MONGODB_LOCAL}
+      # ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGODB_USERNAME}
+      # ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGODB_PASSWORD}
+    networks:
+      meanstack_net:
+        ipv4_address: ${DBVIEWER_IP}
+
+  mongo:
+    image: mongo
+    restart: always
+    # environment:
+    #   MONGO_INITDB_ROOT_USERNAME: ${MONGODB_USERNAME}
+    #   MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_PASSWORD}
+    #   MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
+    #   DATABASE_USER: ${DATABASE_USER}
+    #   DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+    container_name: ${DB_CONTAINER_NAME}
+    ports:
+      - '${MONGODB_LOCAL}:${MONGODB_CONTAINER}'
+    volumes:
+      - mongodata:/data/db
+      - mongoconfig:/data/configdb
+      # - ./mongodb/:/docker-entrypoint-initdb.d
+      # - ./infrastructure/mongodata:/data/db
+      # - ./infrastructure/configdb:/data/configdb
+      # command: mongod --auth
+    networks:
+      meanstack_net:
+        ipv4_address: ${DB_IP}
+
+networks:
+  meanstack_net:
+    ipam:
+      driver: default
+      config:
+        - subnet: ${SUBNET}
+
+volumes:
+  mongodata:
+  mongoconfig:
