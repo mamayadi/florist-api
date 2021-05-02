@@ -30,7 +30,9 @@ userRoutes
    *           application/json:
    *             schema:
    *               type: object
-   *               $ref: '#/components/schemas/User'
+   *               properties:
+   *                 token:
+   *                   type: string
    */
   .post('/register', userController.registerUser)
   /**
@@ -45,7 +47,13 @@ userRoutes
    *         application/json:
    *           schema:
    *             type: object
-   *             $ref: '#/components/schemas/User'
+   *             properties:
+   *               username:
+   *                 type: string
+   *                 example: foulen.benfoulen
+   *               password:
+   *                 type: string
+   *                 example: 123
    *     responses:
    *       200:
    *         description: Return login
@@ -53,7 +61,9 @@ userRoutes
    *           application/json:
    *             schema:
    *               type: object
-   *               $ref: '#/components/schemas/User'
+   *               properties:
+   *                 token:
+   *                   type: string
    */
   .post('/login', userController.authenticateUser);
 
